@@ -111,6 +111,21 @@ class WickedPdfHelperAssetsTest < ActionView::TestCase
       assert_equal 'http://example.com/rails.png', wicked_pdf_asset_path('//example.com/rails.png')
     end
 
+    test 'wicked_pdf_asset_path should return a url when asset is relative path' do
+      Rails.configuration.assets.expects(:compile => true)
+      expects(:asset_path => '../application.css')
+      path = wicked_pdf_asset_path('../application.css')
+
+      assert path.include?('/app/assets/stylesheets/application.css')
+      assert path.include?('file:///')
+
+      Rails.configuration.assets.expects(:compile => false)
+      path = wicked_pdf_asset_path('../application.css')
+
+      assert path.include?('/app/assets/stylesheets/application.css')
+      assert path.include?('file:///')
+    end
+
     test 'WickedPdfHelper::Assets::ASSET_URL_REGEX should match various URL data type formats' do
       assert_match WickedPdf::WickedPdfHelper::Assets::ASSET_URL_REGEX, 'url(\'/asset/stylesheets/application.css\');'
       assert_match WickedPdf::WickedPdfHelper::Assets::ASSET_URL_REGEX, 'url("/asset/stylesheets/application.css");'

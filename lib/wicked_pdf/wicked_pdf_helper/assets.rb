@@ -57,6 +57,8 @@ class WickedPdf
       URI_REGEXP = %r{^[-a-z]+://|^(?:cid|data):|^//}
 
       def asset_pathname(source)
+        source = relative_path(source) if source.to_s[0] == '.'
+
         if precompiled_or_absolute_asset?(source)
           asset = asset_path(source)
           pathname = prepend_protocol(asset)
@@ -78,6 +80,11 @@ class WickedPdf
         else
           Sprockets::Railtie.build_environment(Rails.application).find_asset(path)
         end
+      end
+
+      def relative_path(source)
+        source.gsub(/(fonts|images|stylesheets|javascripts)\//, '')
+        source.gsub(/^\.*\//, '')
       end
 
       # will prepend a http or default_protocol to a protocol relative URL
